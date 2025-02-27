@@ -1,0 +1,6 @@
+[package]
+name = "altair_licstat"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
