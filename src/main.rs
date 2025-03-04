@@ -4,6 +4,9 @@ use std::fs;
 use std::error::Error;
 use regex::Regex;
 
+mod read_file;
+mod parse_json;
+
 struct Cli {
     feature: String,
     server: String,
