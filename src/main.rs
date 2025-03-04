@@ -4,8 +4,6 @@ use std::fs;
 use std::error::Error;
 use regex::Regex;
 
-//mod employees;
-
 struct Cli {
     feature: String,
     server: String,
