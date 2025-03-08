@@ -7,6 +7,8 @@ use regex::Regex;
 mod read_file;
 mod parse_json;
 
+const USER_DB_PATH: &str = "/home/voitec/Rust/users.json";
+
 struct Cli {
     feature: String,
     server: String,
@@ -89,6 +91,22 @@ fn main() {
         println!("Error while collecting input parameters: {error}");
         process::exit(1);
     });
+
+    let user_db = match read_file::read_file(USER_DB_PATH) {
+        Ok(user_db) => user_db,
+        Err(e) => {
+            eprintln!("Error while retrieving User DB");
+            process::exit(1);
+        }
+    };
+
+    let usage_file_content = match read_file::read_file(&cli.path) {
+        Ok(usage_file_content) => usage_file_content,
+        Err(e) => {
+            eprintln!("Error while retrieving usage file content");
+            process::exit(1);
+        }
+    };
 
     if let Err(e) = run(&cli) {
         eprintln!("Unable to parse the file: {e}");
