@@ -63,6 +63,12 @@ fn run(cli: &Cli, user_db: &HashMap<String, String>, usage_file_content: &str) -
                 let re = Regex::new(r"^[0-9]+ license\(s\) used by");
                 if re?.is_match(&line) {
                     println!("Matched line: {}", line);
+                    
+                    let line_splitted = line.split_whitespace();
+                    for chunk in line_splitted {
+                        println!("{chunk}")
+                    }
+
                 }
                 if line.contains("Feature: ") {
                     println!("Another feature encountered");
