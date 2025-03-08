@@ -1,6 +1,5 @@
 use std::env;
 use std::process;
-use std::fs;
 use std::error::Error;
 use regex::Regex;
 use std::collections::HashMap;
@@ -62,12 +61,19 @@ fn run(cli: &Cli, user_db: &HashMap<String, String>, usage_file_content: &str) -
             if feature_found == true {
                 let re = Regex::new(r"^[0-9]+ license\(s\) used by");
                 if re?.is_match(&line) {
+
                     println!("Matched line: {}", line);
-                    
-                    let line_splitted = line.split_whitespace();
-                    for chunk in line_splitted {
-                        println!("{chunk}")
+                    let line_splitted: Vec<&str> = line.split_whitespace().collect();
+                    if line_splitted.len() != 6 {
+                        return Err("Wrong file format, line length should be equal 6")?;
                     }
+
+                    let lic_count: u32 = line_splitted[0].parse()?;
+                    let user_string: Vec<&str>= line_splitted[4].split("@").collect();
+                    if user_string.len() != 2 {
+                        return Err("Format of the user string invalid")?;
+                    }
+
 
                 }
                 if line.contains("Feature: ") {
