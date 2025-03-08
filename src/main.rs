@@ -3,6 +3,7 @@ use std::process;
 use std::fs;
 use std::error::Error;
 use regex::Regex;
+use std::collections::HashMap;
 
 mod read_file;
 mod parse_json;
@@ -37,14 +38,12 @@ impl Cli{
     }
 }
 
-fn run(cli: &Cli) -> Result<(), Box<dyn Error>> {
-    let file_content = fs::read_to_string(&cli.path)?;
-
+fn run(cli: &Cli, user_db: &HashMap<String, String>, usage_file_content: &str) -> Result<(), Box<dyn Error>> {
     let mut serv_found: bool = false;
     let mut feature_found: bool = false;
     let feature_string = format!("Feature: {}", &cli.feature);
 
-    for line in file_content.lines() {
+    for line in usage_file_content.lines() {
         if serv_found == false {
             if line == format!("LM-X License Server on 6200@{}:", &cli.server) {
                 println!("Requested server found: {}", cli.server);
@@ -116,7 +115,7 @@ fn main() {
         }
     };
 
-    if let Err(e) = run(&cli) {
+    if let Err(e) = run(&cli, &user_db, &usage_file_content) {
         eprintln!("Unable to parse the file: {e}");
         process::exit(1);
     }
