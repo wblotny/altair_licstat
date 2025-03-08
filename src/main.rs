@@ -92,10 +92,18 @@ fn main() {
         process::exit(1);
     });
 
-    let user_db = match read_file::read_file(USER_DB_PATH) {
+    let user_db_json = match read_file::read_file(USER_DB_PATH) {
+        Ok(user_db_json) => user_db_json,
+        Err(e) => {
+            eprintln!("Error while retrieving User DB: {e}");
+            process::exit(1);
+        }
+    };
+    
+    let user_db = match parse_json::parse_json(&user_db_json) {
         Ok(user_db) => user_db,
         Err(e) => {
-            eprintln!("Error while retrieving User DB");
+            eprintln!("Error while parsing json: {e}");
             process::exit(1);
         }
     };
@@ -103,7 +111,7 @@ fn main() {
     let usage_file_content = match read_file::read_file(&cli.path) {
         Ok(usage_file_content) => usage_file_content,
         Err(e) => {
-            eprintln!("Error while retrieving usage file content");
+            eprintln!("Error while retrieving usage file content: {e}");
             process::exit(1);
         }
     };
