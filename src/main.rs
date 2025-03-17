@@ -9,6 +9,23 @@ mod parse_json;
 
 const USER_DB_PATH: &str = "/home/voitec/Rust/users.json";
 
+#[derive(Debug)]
+struct Site<'a> {
+    name: &'a str,
+    usage: u32,
+    users: Vec<&'a str>,
+}
+
+impl <'a> Site <'a> {
+    fn new(name: &str) -> Site {
+        Site {
+            name,
+            usage : 0,
+            users : Vec::new(),
+        }
+    }
+}
+
 struct Cli {
     feature: String,
     server: String,
@@ -41,6 +58,7 @@ fn run(cli: &Cli, user_db: &HashMap<String, String>, usage_file_content: &str) -
     let mut serv_found: bool = false;
     let mut feature_found: bool = false;
     let feature_string = format!("Feature: {}", &cli.feature);
+//    let result: HashMap<String, (u32, String)> = HashMap::new();
 
     for line in usage_file_content.lines() {
         if serv_found == false {
@@ -74,6 +92,13 @@ fn run(cli: &Cli, user_db: &HashMap<String, String>, usage_file_content: &str) -
                         return Err("Format of the user string invalid")?;
                     }
 
+                    let user_site = match user_db.get(user_string[0]) {
+                        Some(site) => site,
+                        None => "unknown" 
+                    };
+                    
+                    let test = Site::new(user_site); 
+                    dbg!(test);
 
                 }
                 if line.contains("Feature: ") {
