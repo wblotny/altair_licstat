@@ -11,18 +11,23 @@ const USER_DB_PATH: &str = "/home/voitec/Rust/users.json";
 
 #[derive(Debug)]
 struct Site<'a> {
-    name: &'a str,
+//    name: &'a str,
     usage: u32,
     users: Vec<&'a str>,
 }
 
 impl <'a> Site <'a> {
-    fn new(name: &str) -> Site {
+    fn new(lic_count: u32, user_name: &str) -> Site {
         Site {
-            name,
-            usage : 0,
-            users : Vec::new(),
+            usage : lic_count,
+            users : vec![user_name],
         }
+    }
+    fn add(&mut self, val: u32) {
+        self.usage += val;
+    }
+    fn push_user(&mut self, user_name: &'a str) {
+        self.users.push(user_name);
     }
 }
 
@@ -58,7 +63,7 @@ fn run(cli: &Cli, user_db: &HashMap<String, String>, usage_file_content: &str) -
     let mut serv_found: bool = false;
     let mut feature_found: bool = false;
     let feature_string = format!("Feature: {}", &cli.feature);
-//    let result: HashMap<String, (u32, String)> = HashMap::new();
+    let mut found_sites: HashMap<&str, Site> = HashMap::new();
 
     for line in usage_file_content.lines() {
         if serv_found == false {
@@ -87,22 +92,28 @@ fn run(cli: &Cli, user_db: &HashMap<String, String>, usage_file_content: &str) -
                     }
 
                     let lic_count: u32 = line_splitted[0].parse()?;
+
                     let user_string: Vec<&str>= line_splitted[4].split("@").collect();
                     if user_string.len() != 2 {
                         return Err("Format of the user string invalid")?;
                     }
+                    let user_name = user_string[0];
 
-                    let user_site = match user_db.get(user_string[0]) {
+                    let user_site = match user_db.get(user_name) {
                         Some(site) => site,
                         None => "unknown" 
                     };
-                    
-                    let test = Site::new(user_site); 
-                    dbg!(test);
-
+                   
+                    found_sites.entry(user_site).and_modify(|e| {e.add(lic_count); e.push_user(user_name)}).or_insert(Site::new(lic_count, user_name));
+                       
                 }
                 if line.contains("Feature: ") {
                     println!("Another feature encountered");
+
+                    for site in &found_sites {
+                        dbg!(site);
+                    }
+
                     return Ok(());
                 }
             }
